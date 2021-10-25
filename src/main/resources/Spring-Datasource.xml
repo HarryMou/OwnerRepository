@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!--    声明数据源DataSource，作用是连接数据库-->
+    <bean id="DataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <!--set注入给DruidDataSource提供数据库连接信息-->
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maxActive" value="${jdbc.maxActive}"/>
+    </bean>
+
+    <!--    声明的是mybatis中提供的SqlSessionFactoryBean类-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--        set注入，把数据库连接池赋给了dataSource属性-->
+        <property name="dataSource" ref="DataSource"/>
+        <!--        mybatis主配置文件的位置
+                    configLocaation属性是Resource类型，读取配置文件，它的赋值使用value，指定文件的路径，使用classpath
+        -->
+        <!--        在配置文件中要指定其他类型的配置文件要使用classpath-->
+        <property name="configLocation" value="classpath:Mybatis.xml"/>
+    </bean>
+
+    <!--    MapperScannerConfigurer：再内部调用getMapper生成每个dao接口的代理对象，不需要id-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--        指定sqlsessionFactory对象的属性-->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!--        指定包名，dao接口所在包-->
+        <!--        MapperScannerConfigurer会扫描这个包中所有接口，把每个接口都执行一次getMapper方法，得到每个接口的dao对象-->
+        <property name="basePackage" value="com.usth.dao"/>
+    </bean>
+
+    <!--    声明service-->
+    <bean id="userService" class="com.usth.service.impl.UserServiceImpl">
+        <property name="userDao" ref="userDao"/>
+
+    </bean>
+</beans>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.usth.dao.UserDao">
+    <sql id="findAll">
+        select userid,username,password,sex,email from users
+    </sql>
+    <select id="selectAll" resultType="com.usth.entity.User">
+        <include refid="findAll"/>
+    </select>
+    <insert id="insertOne">
+        insert into users values (null,#{username},#{password},#{sex},#{email})
+    </insert>
+    <select id="selectById" resultType="com.usth.entity.User">
+        <include refid="findAll"/> where userid=#{userid}
+    </select>
+    <update id="updateOne">
+        update users set username=#{username},password=#{password},sex=#{sex},email=#{email} where userid=#{userid}
+    </update>
+    <delete id="deleteOne">
+        delete from users where userid=#{userid}
+    </delete>
+    <select id="selectOne" resultType="com.usth.entity.User">
+        <include refid="findAll"/>
+        <where>
+            <if test="k=='username'">
+                username like #{v} "%"
+            </if>
+            <if test="k=='sex'">
+                sex like #{v} "%"
+            </if>
+            <if test="k=='email'">
+                email like #{v} "%"
+            </if>
+        </where>
+
+    </select>
+</mapper>
